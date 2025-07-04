@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../jwt_auth/__pycache__"
+		}
+	],
+	"settings": {}
+}
