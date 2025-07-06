@@ -10,4 +10,4 @@ def create_db_and_tables():
 
 
 
-    d
+    
