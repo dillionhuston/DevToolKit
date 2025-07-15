@@ -12,6 +12,7 @@ def verify_password(password: str, hashed: str) -> bool:
 
 
 def jwt_generate(payload: dict) -> str:
+    # payload must be a dictionary (e.g., {"email": "...", "role": "..."})
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     return token
 
@@ -19,8 +20,8 @@ def jwt_generate(payload: dict) -> str:
 def decode_payload(token: str) -> dict:
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return decoded 
+        return decoded  # Returns the decoded payload as a dict
     except jwt.ExpiredSignatureError:
-        raise ValueError("token has expired")
+        raise ValueError("Token has expired")
     except jwt.InvalidTokenError:
-        raise ValueError("invalid token")
+        raise ValueError("Invalid token")
