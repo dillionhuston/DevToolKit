@@ -76,7 +76,7 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Annotated[Session, Depends(get_db)]):
 
-    db_user = db.query(User).filter(User.email == db_user.email)
+    db_user = db.query(User).filter(User.email == form_data.username).first()
     if not db_user or not auth.verify_password(form_data.password, db_user.password):
         raise HTTPException(status_code=404, detail="user doesnt exist or wrong password")
     
