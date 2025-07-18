@@ -1,6 +1,8 @@
 import auth 
 import config
 import jwt
+import traceback
+
 
 
 from typing import Annotated
@@ -12,7 +14,8 @@ from pydantic import BaseModel, EmailStr
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from database import SessionLocal, engine, Base
 from model import User
-from schemeas import Userlogin
+from schemeas import Userlogin, Tasks
+from tasks import add
 
 
 app = FastAPI()
@@ -26,20 +29,15 @@ def get_db():
     finally:
         db.close()
 
-
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         user = auth.decode_payload(token)
         if not user:
             raise HTTPException(status_code=404, detail="user doesnt exist or cant be found")
         return user
 
-
 async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="disabled user")
-
-
-
 
 
 @app.get("/health")
@@ -47,15 +45,9 @@ async def hello(name: str = "world"):
     return{"message" : f"Hello {name}"}
 
 
-
-
-
 @app.get("/show")
 def show(name: str = "world"):
     return{"message": f"hello{name}"}
-
-
-
 
 
 @app.post("/register")
@@ -66,9 +58,6 @@ async def register(user: Userlogin, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     return db_user
-
-
-
 
 
 @app.post("/login")
@@ -87,3 +76,9 @@ async def login(
 @app.get("/user")
 async def read_user(current_user: Annotated[User, Depends(get_current_user)]):
     return current_user
+
+
+@app.post("/task")
+async def send():
+    result = add.delay(2, 3)
+    return {"task_id": result.id}

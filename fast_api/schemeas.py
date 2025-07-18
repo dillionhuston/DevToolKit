@@ -10,3 +10,6 @@ class Userlogin(BaseModel):
 
 
 
+class Tasks(BaseModel):
+    message: str
+    

@@ -1,9 +1,7 @@
-from redis import Redis
-from rq import Queue 
+from celery import Celery
 
+celery_app = Celery('worker', broker='redis://localhost:6379/0')
 
-conn = Redis(host='localhost', port=6379)
-queue = Queue(connection=conn)
-
-def send_hello(hello:str):
-    return {"status": "done", "message": hello}   
+@celery_app.task
+def add(x, y):
+    return x + y
