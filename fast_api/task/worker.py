@@ -1,3 +1,4 @@
+import tasks
 from tasks import celery_app
 
 if __name__ == '__main__':
