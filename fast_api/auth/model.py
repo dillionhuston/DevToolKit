@@ -10,3 +10,11 @@ class User(Base):
     username = Column(String)
     password = Column(String)
     
+
+class File(Base):
+
+    __tablename__ = "files"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column
+    filename = Column(String)
+    hash = Column(String)

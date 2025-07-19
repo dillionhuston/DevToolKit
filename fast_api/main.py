@@ -1,4 +1,5 @@
 import auth 
+import auth.auth
 import config
 import jwt
 
@@ -12,6 +13,8 @@ from auth.model import User
 from schemas.schemeas import Userlogin
 from task import tasks
 from celery.result import AsyncResult
+from fastapi import File, UploadFile
+
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
@@ -28,6 +31,7 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Annotated[Session, Depends(get_db)]
 ):
+    #better error handling
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -91,6 +95,8 @@ async def send(num1: int, num2: int):
     result = tasks.add.delay(num1, num2)
     return {"task_id": result.id}
 
+
+# a lot of if's here but its to prevent errors
 @app.get("/status/{task_id}")
 async def get_status(task_id: str):
     result = AsyncResult(task_id, app=tasks.celery_app)
@@ -102,3 +108,12 @@ async def get_status(task_id: str):
         return {"status": "failure", "error": str(result.result)}
     else:
         return {"status": result.state}
+    
+
+@app.post("/upload")
+def upload_file(
+    file: UploadFile = File(), db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme), user: User = Depends(get_current_user)):
+    email = get_current_user()
+    user = db.query(email)
+   
